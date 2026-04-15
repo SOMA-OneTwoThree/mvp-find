@@ -7,15 +7,22 @@ function getVisitStorageKey(pathname: string, source: string) {
   return `visit_logged:${pathname}:${source}`;
 }
 
+function getVisitSource(search: string, referer: string) {
+  const searchParams = new URLSearchParams(search);
+  const sourceFromQuery = searchParams.get("source")?.trim();
+
+  if (sourceFromQuery) {
+    return sourceFromQuery;
+  }
+
+  return referer ? "referral" : "direct";
+}
+
 export function VisitEventLogger() {
   useEffect(() => {
     const pathname = window.location.pathname;
-    const searchParams = new URLSearchParams(window.location.search);
-    const source = searchParams.get("source")?.trim();
-
-    if (!source) {
-      return;
-    }
+    const referer = document.referrer || "";
+    const source = getVisitSource(window.location.search, referer);
 
     const storageKey = getVisitStorageKey(pathname, source);
     const existingState = window.sessionStorage.getItem(storageKey);
@@ -36,7 +43,7 @@ export function VisitEventLogger() {
       const { error } = await supabase.from("visit_events").insert({
         path: pathname,
         source,
-        referer: document.referrer || null,
+        referer: referer || null,
         user_agent: navigator.userAgent || null,
       });
 
