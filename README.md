@@ -14,6 +14,7 @@ npm run dev
 ```
 
 로컬 환경변수는 `.env.local`에만 두고 Git에는 올리지 않습니다.
+GA4 측정 ID도 `.env.local`과 Vercel 환경변수에서만 관리하고 GitHub에는 커밋하지 않습니다.
 
 ## Available Commands
 
